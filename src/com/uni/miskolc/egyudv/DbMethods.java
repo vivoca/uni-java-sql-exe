@@ -14,17 +14,17 @@ public class DbMethods {
             Class.forName("org.sqlite.JDBC");
             //showMsg("Sikeres driver regisztracio!", 1);
         } catch (ClassNotFoundException ex) {
-            showMsg("Hibas driver regisztracio!" + ex.getMessage(), 0);
+            showMsg("Error during db driver registration" + ex.getMessage(), 0);
         }
     }
 
     public void showMsg(String msg, int tipus) {
-        JOptionPane.showMessageDialog(null, msg, "Program uzenet", tipus);
+        JOptionPane.showMessageDialog(null, msg, "Message Dialog", tipus);
     }
 
     public void connect() {
         try {
-            String url = "jdbc:sqlite:C:/Saj�t/University/adatbazis2/sqlite/racedb";
+            String url = "jdbc:sqlite:persondb";
             conn = DriverManager.getConnection(url);
             //showMsg("Connection OK!", 1);
         } catch (SQLException ex) {
@@ -41,38 +41,75 @@ public class DbMethods {
         }
     }
     
-    public RaceTM readData() {
-    	Object racetmn[] = {"C", "ID", "Location", "Race date", "Driver name", "Point"};
-		RaceTM raceTM = new RaceTM(racetmn, 0);
-    	String location = "";
-    	String raceDate = "";
-    	String driverName = "";
-    	int id = 0;
-    	int point = 0;
-    	String x = "\t";
-    	String sqlp = "SELECT id, location, race_date, driver_name, point FROM race_result";
+    public PersonTM readData() {
+    	Object persontmn[] = {"C", "ID", "Name", "Birth date", "City", "Height", "Weight"};
+		PersonTM personTM = new PersonTM(persontmn, 0);
+    	String name;
+    	String birthDate;
+    	String city;
+    	int id;
+    	int height;
+    	int weight;
+    	String sqlp = "SELECT id, name, birth_date, city, height, weight FROM person ";
     	try {
     		statement = conn.createStatement();
     		resultSet = statement.executeQuery(sqlp);
     		while(resultSet.next()) {
     			id = resultSet.getInt("id");
-    			location = resultSet.getString("location");
-    			raceDate = resultSet.getString("race_date");
-    			driverName = resultSet.getString("driver_name");
-    			point = resultSet.getInt("point");
-    			raceTM.addRow(new Object[] {false, id, location, raceDate, driverName, point});
+    			name = resultSet.getString("name");
+    			birthDate = resultSet.getString("birth_date");
+    			city = resultSet.getString("city");
+    			height = resultSet.getInt("height");
+    			weight = resultSet.getInt("weight");
+    			personTM.addRow(new Object[] {false, id, name, birthDate, city, height, weight});
     		}
     		resultSet.close();
     	} catch (SQLException ex) {
     		showMsg(ex.getMessage(), 0);
     	}
-    	return raceTM;
+    	return personTM;
+    }
+    
+    public boolean checkIdExists(String id) {
+    	
+    	String sqlp = "SELECT id FROM person WHERE id = " + id;
+    	try {
+    		statement = conn.createStatement();
+    		resultSet = statement.executeQuery(sqlp);
+
+			if (!resultSet.next()) {
+				//ResultSet is empty, ID not exists
+				resultSet.close();
+				return false;
+			} else {
+				resultSet.close();
+				return true;
+			}
+    		
+    	} catch (SQLException ex) {
+    		showMsg(ex.getMessage(), 0);
+    	}
+    	return false;
     }
     
     
-    public void insertData(String id, String location, String raceDate, String driverName, String point) {
+    public double getAvgWeightByCity(String city) {
+    	String sqlp = "SELECT avg(weight) as avgWeight FROM person WHERE upper(city) = upper('" + city + "')";
+    	try {
+    		statement = conn.createStatement();
+    		resultSet = statement.executeQuery(sqlp);
+    		return resultSet.getDouble("avgWeight");
+    		
+    	} catch (SQLException ex) {
+    		showMsg(ex.getMessage(), 0);
+    	}
+    	return 0;
+    }
+    
+    
+    public void insertData(String id, String name, String birthDate, String city, String height, String weight) {
     	
-    	String sqlp = "INSERT INTO race_result values(" + id + ", '" + location + "', '" + raceDate + "', '" + driverName + "', " + point + ")";
+    	String sqlp = "INSERT INTO person values(" + id + ", '" + name + "', '" + birthDate + "', '" + city + "', " + height + ", " + weight + ")";
     	
     	try {
     		statement = conn.createStatement();

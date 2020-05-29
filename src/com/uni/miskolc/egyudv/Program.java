@@ -1,6 +1,5 @@
 package com.uni.miskolc.egyudv;
 
-import java.awt.BorderLayout;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -14,7 +13,7 @@ public class Program extends JFrame {
 
 	private JPanel contentPane;
 	private DbMethods dbMethods = new DbMethods();
-	private RaceTM raceTM;
+	private PersonTM personTM;
 
 	/**
 	 * Launch the application.
@@ -48,27 +47,37 @@ public class Program extends JFrame {
 		btnLista.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				dbMethods.connect();
-				raceTM = dbMethods.readData();
+				personTM = dbMethods.readData();
 				dbMethods.disconnect();
-				RaceList raceList = new RaceList(Program.this, raceTM);
-				raceList.setVisible(true);
+				PersonList personList = new PersonList(Program.this, personTM);
+				personList.setVisible(true);
 
 			}
 		});
-		btnLista.setBounds(10, 11, 89, 23);
+		btnLista.setBounds(10, 11, 110, 23);
 		contentPane.add(btnLista);
 		
 		JButton btnCreateData = new JButton("Create");
 		btnCreateData.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				NewResult newResult = new NewResult();
-				newResult.setVisible(true);
+				NewPerson newPerson = new NewPerson();
+				newPerson.setVisible(true);
 			}
 		});
-		btnCreateData.setBounds(10, 45, 89, 23);
+		btnCreateData.setBounds(10, 45, 110, 23);
 		contentPane.add(btnCreateData);
 		
-		Object racetmn[] = {"C", "ID", "Location", "Race date", "Driver name", "Point"};
-		raceTM = new RaceTM(racetmn, 0);
+		JButton btnAvgWeight = new JButton("Avg Weight");
+		btnAvgWeight.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				AvgWeight avgWeight = new AvgWeight();
+				avgWeight.setVisible(true);
+			}
+		});
+		btnAvgWeight.setBounds(10, 79, 110, 23);
+		contentPane.add(btnAvgWeight);
+		
+		Object persontmn[] = {"C", "ID", "Name", "Birth date", "City", "Height", "Weight"};
+		personTM = new PersonTM(persontmn, 0);
 	}
 }
